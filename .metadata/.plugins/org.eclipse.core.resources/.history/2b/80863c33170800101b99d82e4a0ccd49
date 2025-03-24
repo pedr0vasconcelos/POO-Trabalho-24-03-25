@@ -1,0 +1,76 @@
+package view;
+
+import model.Compromisso;
+import service.AgendaService;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final AgendaService agendaService = new AgendaService();
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public static void main(String[] args) {
+        int opcao;
+
+        do {
+            System.out.println("\n==== AGENDA DE COMPROMISSOS ====");
+            System.out.println("1 - Adicionar compromisso");
+            System.out.println("2 - Exibir compromissos futuros");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // limpa o buffer
+
+            switch (opcao) {
+                case 1:
+                    adicionarCompromisso();
+                    break;
+                case 2:
+                    exibirCompromissosFuturos();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção inválida!");
+            }
+
+        } while (opcao != 0);
+    }
+
+    private static void adicionarCompromisso() {
+        System.out.print("\nDigite a descrição do compromisso: ");
+        String descricao = scanner.nextLine();
+
+        System.out.print("Digite a data do compromisso (dd/MM/yyyy): ");
+        String dataStr = scanner.nextLine();
+
+        try {
+            agendaService.adicionarCompromisso(descricao, dataStr);
+            System.out.println("Compromisso adicionado com sucesso!");
+        } catch (Exception e) {
+            System.out.println("Erro ao adicionar compromisso: " + e.getMessage());
+        }
+    }
+
+    private static void exibirCompromissosFuturos() {
+        System.out.print("\nDigite quantos dias à frente deseja consultar: ");
+        int dias = scanner.nextInt();
+        scanner.nextLine(); // limpa buffer
+
+        List<Compromisso> futuros = agendaService.listarCompromissosFuturos(dias);
+
+        if (futuros.isEmpty()) {
+            System.out.println("Nenhum compromisso encontrado nesse período.");
+        } else {
+            System.out.println("\nCompromissos encontrados:");
+            for (Compromisso compromisso : futuros) {
+                System.out.println(compromisso);
+            }
+        }
+    }
+}
